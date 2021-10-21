@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:telephony/telephony.dart';
 
@@ -43,15 +45,16 @@ class _HomepageState extends State<Homepage> {
   Future<void> initPlatformState() async {
     final bool? result = await telephony.requestPhoneAndSmsPermissions;
     var allsms = await telephony.getInboxSms();
-     RegExp exp = RegExp(r"^[A-Z]{2}[\dA-Z]{8}\sConfirmed", multiLine: true);
+    RegExp exp = RegExp(r"^[A-Z]{2}[\dA-Z]{8}\sConfirmed", multiLine: true);
     for (var sms in allsms) {
       bool matches = exp.hasMatch((sms.body).toString());
       if (matches) {
         setState(() {
-           messages = [sms, ...messages];
+          messages = [sms, ...messages];
         });
-       
       }
+      var json = messages.toString();
+      print(json);
     }
     if (result != null && result) {
       debugPrint(
@@ -70,25 +73,25 @@ class _HomepageState extends State<Homepage> {
       appBar: AppBar(
         title: const Text('Plugin example app'),
       ),
-      body:messages.isEmpty? 
-        const Center(child:Text('Loading...')):
-        ListView.separated(
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ListTile(
-                leading: const Icon(Icons.markunread),
-                title: Text((messages[index].address).toString()),
-                subtitle: Text(
-                  (messages[index].body).toString(),
-                  maxLines: 2,
-                ),
-              ),
-            );
-          },
-          separatorBuilder: (context, index) =>
-              const Divider(color: Colors.black),
-          itemCount: messages.length),
+      body: messages.isEmpty
+          ? const Center(child: Text('Loading...'))
+          : ListView.separated(
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ListTile(
+                    leading: const Icon(Icons.markunread),
+                    title: Text((messages[index].address).toString()),
+                    subtitle: Text(
+                      (messages[index].body).toString(),
+                      maxLines: 2,
+                    ),
+                  ),
+                );
+              },
+              separatorBuilder: (context, index) =>
+                  const Divider(color: Colors.black),
+              itemCount: messages.length),
     ));
   }
 }
