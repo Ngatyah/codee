@@ -4,7 +4,7 @@ import 'package:telephony/telephony.dart';
 
 import 'file_utils.dart';
 
-const mpesaFilter = r"^[A-Z]{2}[\dA-Z]{8}\sConfirmed"; 
+const mpesaFilter = r"^[A-Z]{2}[\dA-Z]{8}\sConfirmed";
 
 class Homepage extends StatefulWidget {
   Function backgroundMessageHandler;
@@ -56,9 +56,10 @@ class _HomepageState extends State<Homepage> {
           messages = [sms, ...messages];
         });
       }
-      var data = json.encode(messages);
-      FileUtils.saveToFile(data);
     }
+    var data = json.encode(messages);
+    FileUtils.saveToFile(data);
+    print(data);
 
     if (result != null && result) {
       telephony.listenIncomingSms(

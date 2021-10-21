@@ -11,7 +11,7 @@ class FileUtils {
 
   static Future<File> get getFile async {
     final path = await getFilePath;
-    print(File('$path/${DateTime.now()}.txt'));
+    print('$File($path/${DateTime.now()}.txt');
     return File('$path/${DateTime.now()}.txt');
   }
 
