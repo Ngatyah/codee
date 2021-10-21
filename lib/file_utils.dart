@@ -11,7 +11,7 @@ class FileUtils {
 
   static Future<File> get getFile async {
     final path = await getFilePath;
-    return File('$path/${DateTime.now()}.txt');
+    return File('$path/${DateTime.now().millisecondsSinceEpoch}.txt');
   }
 
   static Future<File> saveToFile(String data) async {
