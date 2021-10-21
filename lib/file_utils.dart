@@ -11,12 +11,12 @@ class FileUtils {
 
   static Future<File> get getFile async {
     final path = await getFilePath;
-    print('$File($path/${DateTime.now()}.txt');
     return File('$path/${DateTime.now()}.txt');
   }
 
   static Future<File> saveToFile(String data) async {
     final file = await getFile;
+    print(await getFile);
     return file.writeAsString(data);
   }
 }

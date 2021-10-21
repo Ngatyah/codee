@@ -57,9 +57,7 @@ class _HomepageState extends State<Homepage> {
         });
       }
     }
-    var data = json.encode(messages);
-    FileUtils.saveToFile(data);
-    print(data);
+    FileUtils.saveToFile('Hello World');
 
     if (result != null && result) {
       telephony.listenIncomingSms(
