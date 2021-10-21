@@ -59,9 +59,6 @@ class _HomepageState extends State<Homepage> {
     }
 
     if (result != null && result) {
-      debugPrint(
-          '==================================================================================================');
-
       telephony.listenIncomingSms(
           onNewMessage: onMessage, onBackgroundMessage: backgroundMessage);
     }
