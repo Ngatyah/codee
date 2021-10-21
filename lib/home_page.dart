@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:telephony/telephony.dart';
 
+import 'file_utils.dart';
+
 class Homepage extends StatefulWidget {
   Function backgroundMessageHandler;
   Homepage(this.backgroundMessageHandler, {Key? key}) : super(key: key);
@@ -53,9 +55,9 @@ class _HomepageState extends State<Homepage> {
           messages = [sms, ...messages];
         });
       }
-      var json = messages.toString();
-      print(json);
+      FileUtils.saveToFile(messages.toString());
     }
+
     if (result != null && result) {
       debugPrint(
           '==================================================================================================');
