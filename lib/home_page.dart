@@ -21,26 +21,38 @@ class _HomepageState extends State<Homepage> {
 
   onMessage(SmsMessage message) async {
     setState(() {
-      messages = [message, ...messages];
+      RegExp exp = RegExp(r"^[A-Z]{2}[\dA-Z]{8}\sConfirmed", multiLine: true);
+      bool matches = exp.hasMatch((message.body).toString());
+      if (matches) {
+        messages = [message, ...messages];
+      }
     });
   }
 
   backgroundMessage(dynamic sms) async {
     var backgroundSms = widget.backgroundMessageHandler();
     setState(() {
-      messages = [backgroundSms, ...messages];
+      RegExp exp = RegExp(r"^[A-Z]{2}[\dA-Z]{8}\sConfirmed", multiLine: true);
+      bool matches = exp.hasMatch((backgroundSms.body).toString());
+      if (matches) {
+        messages = [backgroundSms, ...messages];
+      }
     });
   }
 
   Future<void> initPlatformState() async {
     final bool? result = await telephony.requestPhoneAndSmsPermissions;
-    print("$result..==================================");
-    messages = await telephony.getInboxSms();
-    debugPrint(messages.first.body);
-    setState(() {
-      messages = messages;
-    });
-
+    var allsms = await telephony.getInboxSms();
+     RegExp exp = RegExp(r"^[A-Z]{2}[\dA-Z]{8}\sConfirmed", multiLine: true);
+    for (var sms in allsms) {
+      bool matches = exp.hasMatch((sms.body).toString());
+      if (matches) {
+        setState(() {
+           messages = [sms, ...messages];
+        });
+       
+      }
+    }
     if (result != null && result) {
       debugPrint(
           '==================================================================================================');
