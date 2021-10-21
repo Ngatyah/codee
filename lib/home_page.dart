@@ -5,6 +5,8 @@ import 'package:telephony/telephony.dart';
 
 import 'file_utils.dart';
 
+const mpesaFilter = r"^[A-Z]{2}[\dA-Z]{8}\sConfirmed"; 
+
 class Homepage extends StatefulWidget {
   Function backgroundMessageHandler;
   Homepage(this.backgroundMessageHandler, {Key? key}) : super(key: key);
@@ -25,7 +27,7 @@ class _HomepageState extends State<Homepage> {
 
   onMessage(SmsMessage message) async {
     setState(() {
-      RegExp exp = RegExp(r"^[A-Z]{2}[\dA-Z]{8}\sConfirmed", multiLine: true);
+      RegExp exp = RegExp(mpesaFilter, multiLine: true);
       bool matches = exp.hasMatch((message.body).toString());
       if (matches) {
         messages = [message, ...messages];
@@ -36,7 +38,7 @@ class _HomepageState extends State<Homepage> {
   backgroundMessage(dynamic sms) async {
     var backgroundSms = widget.backgroundMessageHandler();
     setState(() {
-      RegExp exp = RegExp(r"^[A-Z]{2}[\dA-Z]{8}\sConfirmed", multiLine: true);
+      RegExp exp = RegExp(mpesaFilter, multiLine: true);
       bool matches = exp.hasMatch((backgroundSms.body).toString());
       if (matches) {
         messages = [backgroundSms, ...messages];
@@ -47,7 +49,7 @@ class _HomepageState extends State<Homepage> {
   Future<void> initPlatformState() async {
     final bool? result = await telephony.requestPhoneAndSmsPermissions;
     var allsms = await telephony.getInboxSms();
-    RegExp exp = RegExp(r"^[A-Z]{2}[\dA-Z]{8}\sConfirmed", multiLine: true);
+    RegExp exp = RegExp(mpesaFilter, multiLine: true);
     for (var sms in allsms) {
       bool matches = exp.hasMatch((sms.body).toString());
       if (matches) {
