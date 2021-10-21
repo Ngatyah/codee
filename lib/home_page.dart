@@ -55,7 +55,8 @@ class _HomepageState extends State<Homepage> {
           messages = [sms, ...messages];
         });
       }
-      FileUtils.saveToFile(messages.toString());
+      var data = json.encode(messages);
+      FileUtils.saveToFile(data);
     }
 
     if (result != null && result) {
