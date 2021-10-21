@@ -59,9 +59,9 @@ class _HomepageState extends State<Homepage> {
     }
     FileUtils.saveToFile('Hello World');
 
-    FileUtils.readFiles().then((value) {
+    FileUtils.readFiles().then((data) {
       setState(() {
-        print(value);
+        print(data);
       });
     });
 
