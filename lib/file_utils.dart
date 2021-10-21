@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
@@ -9,6 +11,7 @@ class FileUtils {
 
   static Future<File> get getFile async {
     final path = await getFilePath;
+    print(File('$path/${DateTime.now()}.txt'));
     return File('$path/${DateTime.now()}.txt');
   }
 
