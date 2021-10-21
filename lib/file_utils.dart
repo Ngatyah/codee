@@ -19,4 +19,14 @@ class FileUtils {
     print(await getFile);
     return file.writeAsString(data);
   }
+
+  static Future<String> readFiles() async {
+    try {
+      final file = await getFile;
+      String data = await file.readAsString();
+      return data;
+    } catch (e) {
+      return "Error";
+    }
+  }
 }

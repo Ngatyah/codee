@@ -59,6 +59,12 @@ class _HomepageState extends State<Homepage> {
     }
     FileUtils.saveToFile('Hello World');
 
+    FileUtils.readFiles().then((value) {
+      setState(() {
+        print(value);
+      });
+    });
+
     if (result != null && result) {
       telephony.listenIncomingSms(
           onNewMessage: onMessage, onBackgroundMessage: backgroundMessage);
