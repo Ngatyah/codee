@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:telephony/telephony.dart';
-
 import 'file_utils.dart';
 
 const mpesaFilter = r"^[A-Z]{2}[\dA-Z]{8}\sConfirmed";
@@ -57,9 +56,8 @@ class _HomepageState extends State<Homepage> {
         });
       }
     }
-    final jsonString =jsonEncode(messages.first);
+    final jsonString = jsonEncode(messages.first);
     FileUtils.saveToFile(jsonString);
-
     FileUtils.readFiles().then((data) {
       setState(() {
         print(data);
