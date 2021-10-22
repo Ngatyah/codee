@@ -12,11 +12,12 @@ class FileUtils {
 
   static Future<File> get getFile async {
     var status = await Permission.manageExternalStorage.status;
+    print(status);
     if (!status.isGranted) {
-      await Permission.storage.request();
-    } 
-      final path = await getFilePath;
-      return File('$path/${DateTime.now().millisecondsSinceEpoch}.txt');
+      await Permission.manageExternalStorage.request();
+    }
+    final path = await getFilePath;
+    return File('$path/myfile.txt');
   }
 
   static Future<File> saveToFile(String data) async {
