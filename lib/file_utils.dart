@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_print
 
 import 'dart:io';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 
 class FileUtils {
@@ -11,11 +10,6 @@ class FileUtils {
   }
 
   static Future<File> get getFile async {
-    var status = await Permission.manageExternalStorage.status;
-    print(status);
-    if (!status.isGranted) {
-      await Permission.manageExternalStorage.request();
-    }
     final path = await getFilePath;
     return File('$path/myfile.txt');
   }

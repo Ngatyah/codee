@@ -4,7 +4,7 @@ import 'package:telephony/telephony.dart';
 import 'home_page.dart';
 
 onBackgroundMessage(SmsMessage message) async {
-   debugPrint(message.body);
+   debugPrint(message.body); 
   return message;
 }
 

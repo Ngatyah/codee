@@ -15,7 +15,7 @@
     <application>
         ...
         ...
-
+       android:requestLegacyExternalStorage="true";
         <receiver android:name="com.shounakmulay.telephony.sms.IncomingSmsReceiver"
             android:permission="android.permission.BROADCAST_SMS" android:exported="true">
             <intent-filter>
