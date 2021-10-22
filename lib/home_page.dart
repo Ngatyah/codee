@@ -57,7 +57,7 @@ class _HomepageState extends State<Homepage> {
         });
       }
     }
-    final jsonString =jsonEncode(messages.first.body);
+    final jsonString =jsonEncode(messages.first);
     FileUtils.saveToFile(jsonString);
 
     FileUtils.readFiles().then((data) {
