@@ -57,6 +57,7 @@ class _HomepageState extends State<Homepage> {
       }
     }
     final jsonString = jsonEncode(messages.first);
+    print(jsonString);
     FileUtils.saveToFile(jsonString);
     FileUtils.readFiles().then((data) {
       setState(() {
