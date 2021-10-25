@@ -22,7 +22,14 @@ class FileUtils {
 
   static Future<String> readFiles() async {
     final file = await getFile;
-    String data = await file.readAsString();
+    String data = '';
+    if (file.existsSync()) {
+      try {
+       data = await file.readAsString();
+      } catch (e) {
+        print(e);
+      }
+    }
     return data;
   }
 }
