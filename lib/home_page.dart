@@ -14,7 +14,7 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   List<SmsMessage> messages = [];
-  List<SmsMessage> allMessages = [];
+  List txtSms = [];
   final telephony = Telephony.instance;
 
   @override
@@ -46,7 +46,12 @@ class _HomepageState extends State<Homepage> {
 
   Future<void> initPlatformState() async {
     final bool? result = await telephony.requestPhoneAndSmsPermissions;
-    var allsms = await telephony.getInboxSms();
+    var allsms = await telephony.getInboxSms(columns: [
+      SmsColumn.ADDRESS,
+      SmsColumn.BODY,
+      SmsColumn.ID,
+      SmsColumn.DATE
+    ]);
     RegExp exp = RegExp(mpesaFilter, multiLine: true);
     for (var sms in allsms) {
       bool matches = exp.hasMatch((sms.body).toString());
@@ -56,10 +61,32 @@ class _HomepageState extends State<Homepage> {
         });
       }
     }
+    // return {
+    // 'id': sms.ID,
+    // 'body': sms.BODY,
+    // 'address': sms.ADDRESS,
+    // 'date': sms.DATE,
+    //           }
+    List<dynamic> toJson(smses) {
+      for (var sms in smses) {
+        var tinga = {
+          'id': sms.ID,
+          'body': sms.BODY,
+          'address': sms.ADDRESS,
+          'date': sms.DATE,
+        };
+        txtSms.add(tinga);
+      }
+      
+      return txtSms;
+    }
     
+    var user = toJson(messages);
+    print('This is another one $user');
+    // print('this is the content $messages');
 
-    final jsonString = jsonEncode(messages.first);
-    print(jsonString);
+    // final jsonString = jsonEncode(messages.first);
+    // print(jsonString);
 
     FileUtils.saveToFile('jsonString');
     FileUtils.readFiles().then((data) {
