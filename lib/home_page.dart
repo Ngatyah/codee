@@ -63,12 +63,12 @@ class _HomepageState extends State<Homepage> {
       }
     }
 
-    Future<List> toJson(smses) async {
+    List<dynamic> toJson(smses) {
       for (var sms in smses) {
-        var tinga =  {
-          'address': sms.address,
+        var tinga = {
+          'id': sms.address,
           'body': sms.body,
-          'id': sms.id,
+          'address': sms.id,
           'date': sms.date,
         };
         txtSms.add(tinga);
