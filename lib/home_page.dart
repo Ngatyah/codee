@@ -16,6 +16,7 @@ class _HomepageState extends State<Homepage> {
   List<SmsMessage> messages = [];
   List txtSms = [];
   final telephony = Telephony.instance;
+  int couter = 0;
 
   @override
   void initState() {
@@ -61,34 +62,25 @@ class _HomepageState extends State<Homepage> {
         });
       }
     }
-    // return {
-    // 'id': sms.ID,
-    // 'body': sms.BODY,
-    // 'address': sms.ADDRESS,
-    // 'date': sms.DATE,
-    //           }
-    List<dynamic> toJson(smses) {
+
+    Future<List> toJson(smses) async {
       for (var sms in smses) {
-        var tinga = {
-          'id': sms.ID,
-          'body': sms.BODY,
-          'address': sms.ADDRESS,
-          'date': sms.DATE,
+        var tinga =  {
+          'address': sms.address,
+          'body': sms.body,
+          'id': sms.id,
+          'date': sms.date,
         };
         txtSms.add(tinga);
+        couter++;
       }
-      
+
       return txtSms;
     }
-    
-    var user = toJson(messages);
-    print('This is another one $user');
-    // print('this is the content $messages');
 
-    // final jsonString = jsonEncode(messages.first);
-    // print(jsonString);
-
-    FileUtils.saveToFile('jsonString');
+    var user =  toJson(messages);
+    final jsonString = json.encode(user);
+    FileUtils.saveToFile(jsonString);
     FileUtils.readFiles().then((data) {
       setState(() {
         print(data);
