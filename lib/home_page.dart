@@ -23,6 +23,20 @@ class _HomepageState extends State<Homepage> {
     super.initState();
     initPlatformState();
   }
+   List<dynamic> toJson(smses) {
+      for (var sms in smses) {
+        var tinga = {
+          'id': sms.address,
+          'body': sms.body,
+          'address': sms.id,
+          'date': sms.date,
+        };
+        txtSms.add(tinga);
+        couter++;
+      }
+
+      return txtSms;
+    }
 
   onMessage(SmsMessage message) async {
     setState(() {
@@ -47,7 +61,10 @@ class _HomepageState extends State<Homepage> {
 
   Future<void> initPlatformState() async {
     final bool? result = await telephony.requestPhoneAndSmsPermissions;
-    var allsms = await telephony.getInboxSms(columns: [
+    
+
+    if (result != null && result) {
+      var allsms = await telephony.getInboxSms(columns: [
       SmsColumn.ADDRESS,
       SmsColumn.BODY,
       SmsColumn.ID,
@@ -62,32 +79,14 @@ class _HomepageState extends State<Homepage> {
         });
       }
     }
-
-    List<dynamic> toJson(smses) {
-      for (var sms in smses) {
-        var tinga = {
-          'id': sms.address,
-          'body': sms.body,
-          'address': sms.id,
-          'date': sms.date,
-        };
-        txtSms.add(tinga);
-        couter++;
-      }
-
-      return txtSms;
-    }
-
     var user =  toJson(messages);
     final jsonString = json.encode(user);
     FileUtils.saveToFile(jsonString);
     FileUtils.readFiles().then((data) {
       setState(() {
-        print(data);
+        print('Here is the Data $data');
       });
     });
-
-    if (result != null && result) {
       telephony.listenIncomingSms(
           onNewMessage: onMessage, onBackgroundMessage: backgroundMessage);
     }
