@@ -4,14 +4,11 @@ import 'package:telephony/telephony.dart';
 import 'home_page.dart';
 
 onBackgroundMessage(SmsMessage message) async {
-   debugPrint(message.body); 
   return message;
 }
-
 void main() {
   runApp(const MyApp());
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 

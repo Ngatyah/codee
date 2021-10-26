@@ -118,7 +118,7 @@ class _HomepageState extends State<Homepage> {
                 );
               },
               separatorBuilder: (context, index) =>
-                  const Divider(color: Colors.black),
+                  const Divider(color: Colors.cyan),
               itemCount: messages.length),
     ));
   }
