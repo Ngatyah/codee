@@ -16,7 +16,7 @@ class _HomepageState extends State<Homepage> {
   List<SmsMessage> messages = [];
   List txtSms = [];
   final telephony = Telephony.instance;
-  int couter = 0;
+ 
 
   @override
   void initState() {
@@ -33,7 +33,7 @@ class _HomepageState extends State<Homepage> {
           'date': sms.date,
         };
         txtSms.add(tinga);
-        couter++;
+        
       }
 
       return txtSms;
