@@ -1,3 +1,4 @@
+import 'package:telephony/telephony.dart';
 const String smsDb = 'messages';
 
 class SmsFields {
@@ -12,4 +13,6 @@ class SmsFields {
   static const String title = 'title';
   static const String body = 'body';
   static const String date = 'date';
+
 }
+

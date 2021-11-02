@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:telephony/telephony.dart';
+import 'database/sms_database.dart';
 import 'file_utils.dart';
 
 const mpesaFilter = r"^[A-Z]{2}[\dA-Z]{8}\sConfirmed";
@@ -16,28 +17,27 @@ class _HomepageState extends State<Homepage> {
   List<SmsMessage> messages = [];
   List txtSms = [];
   final telephony = Telephony.instance;
- 
 
   @override
   void initState() {
     super.initState();
     initPlatformState();
   }
-  //convert to json
-   List<dynamic> toJson(smses) {
-      for (var sms in smses) {
-        var tinga = {
-          'id': sms.address,
-          'body': sms.body,
-          'address': sms.id,
-          'date': sms.date,
-        };
-        txtSms.add(tinga);
-        
-      }
 
-      return txtSms;
+  //convert to json
+  List<dynamic> toJson(smses) {
+    for (var sms in smses) {
+      var tinga = {
+        'id': sms.address,
+        'body': sms.body,
+        'address': sms.id,
+        'date': sms.date,
+      };
+      txtSms.add(tinga);
     }
+
+    return txtSms;
+  }
 
   onMessage(SmsMessage message) async {
     setState(() {
@@ -62,32 +62,32 @@ class _HomepageState extends State<Homepage> {
 
   Future<void> initPlatformState() async {
     final bool? result = await telephony.requestPhoneAndSmsPermissions;
-    
 
     if (result != null && result) {
       var allsms = await telephony.getInboxSms(columns: [
-      SmsColumn.ADDRESS,
-      SmsColumn.BODY,
-      SmsColumn.ID,
-      SmsColumn.DATE
-    ]);
-    RegExp exp = RegExp(mpesaFilter, multiLine: true);
-    for (var sms in allsms) {
-      bool matches = exp.hasMatch((sms.body).toString());
-      if (matches) {
-        setState(() {
-          messages = [sms, ...messages];
-        });
+        SmsColumn.ADDRESS,
+        SmsColumn.BODY,
+        SmsColumn.ID,
+        SmsColumn.DATE
+      ]);
+      RegExp exp = RegExp(mpesaFilter, multiLine: true);
+      for (var sms in allsms) {
+        bool matches = exp.hasMatch((sms.body).toString());
+        if (matches) {
+          setState(() {
+            messages = [sms, ...messages];
+          });
+        }
       }
-    }
-    var user =  toJson(messages);
-    final jsonString = json.encode(user);
-    FileUtils.saveToFile(jsonString);
-    FileUtils.readFiles().then((data) {
-      setState(() {
-        print('Here is the Data $data');
+      
+      var user = toJson(messages);
+      final jsonString = json.encode(user);
+      FileUtils.saveToFile(jsonString);
+      FileUtils.readFiles().then((data) {
+        setState(() {
+          print('Here is the Data $data');
+        });
       });
-    });
       telephony.listenIncomingSms(
           onNewMessage: onMessage, onBackgroundMessage: backgroundMessage);
     }
