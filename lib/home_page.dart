@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:telephony/telephony.dart';
 import 'database/sms_database.dart';
 import 'file_utils.dart';
+import 'models/messages.dart';
 
 const mpesaFilter = r"^[A-Z]{2}[\dA-Z]{8}\sConfirmed";
 
@@ -25,7 +26,7 @@ class _HomepageState extends State<Homepage> {
   }
 
   //convert to json
-  List<dynamic> toJson(smses) {
+   List<dynamic> toJson(smses) {
     for (var sms in smses) {
       var tinga = {
         'id': sms.address,
@@ -74,12 +75,17 @@ class _HomepageState extends State<Homepage> {
       for (var sms in allsms) {
         bool matches = exp.hasMatch((sms.body).toString());
         if (matches) {
+           SmsDatabase.instance.insert({
+            SmsFields.id:sms.id,
+            SmsFields.body:sms.body,
+            SmsFields.title:sms.address,
+            SmsFields.date:sms.date,
+          });
           setState(() {
             messages = [sms, ...messages];
           });
         }
       }
-      
       var user = toJson(messages);
       final jsonString = json.encode(user);
       FileUtils.saveToFile(jsonString);
@@ -88,6 +94,7 @@ class _HomepageState extends State<Homepage> {
           print('Here is the Data $data');
         });
       });
+
       telephony.listenIncomingSms(
           onNewMessage: onMessage, onBackgroundMessage: backgroundMessage);
     }
