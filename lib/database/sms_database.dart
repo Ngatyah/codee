@@ -41,4 +41,8 @@ class SmsDatabase {
     Database db = await instance.database;
     return await db.query(smsDb,orderBy: orderBy);
   }
+  Future close() async {
+    final db = await instance.database;
+    db.close();
+  }
 }

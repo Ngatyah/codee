@@ -29,6 +29,11 @@ class _HomepageState extends State<Homepage> {
     initPlatformState();
     refreshSmses();
   }
+  @override
+  void dispose() {
+    super.dispose();
+     SmsDatabase.instance.close();
+  }
 
   //convert to json
   // List<dynamic> toJson(smses) {
@@ -134,8 +139,8 @@ class _HomepageState extends State<Homepage> {
       appBar: AppBar(
         title: const Text('Plugin example app'),
       ),
-      body: querrySms.isEmpty
-          ? const Center(child: Text('Loading...'))
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator(),)
           : ListView.separated(
               itemBuilder: (context, index) {
                 return Padding(
