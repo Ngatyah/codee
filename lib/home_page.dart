@@ -42,24 +42,34 @@ class _HomepageState extends State<Homepage> {
 
   //   return txtSms;
   // }
+  addSmsToDatabase(dynamic message) async {
+    await SmsDatabase.instance.insert({
+      SmsFields.id: message.id,
+      SmsFields.body: message.body,
+      SmsFields.title: message.address,
+      SmsFields.date: message.date,
+    });
+  }
 
   onMessage(SmsMessage message) async {
-    setState(() {
+    setState(() async {
       RegExp exp = RegExp(mpesaFilter, multiLine: true);
       bool matches = exp.hasMatch((message.body).toString());
       if (matches) {
+        addSmsToDatabase(message);
         messages = [message, ...messages];
       }
     });
   }
 
   backgroundMessage(dynamic sms) async {
-    var backgroundSms = widget.backgroundMessageHandler();
-    setState(() {
+    var bgSms = widget.backgroundMessageHandler();
+    setState(() async {
       RegExp exp = RegExp(mpesaFilter, multiLine: true);
-      bool matches = exp.hasMatch((backgroundSms.body).toString());
+      bool matches = exp.hasMatch((bgSms.body).toString());
       if (matches) {
-        messages = [backgroundSms, ...messages];
+        addSmsToDatabase(bgSms);
+        messages = [bgSms, ...messages];
       }
     });
   }
@@ -67,7 +77,6 @@ class _HomepageState extends State<Homepage> {
   Future<void> initPlatformState() async {
     final bool? result = await telephony.requestPhoneAndSmsPermissions;
     count = Sqflite.firstIntValue(await SmsDatabase.instance.readAll());
-    
 
     print('Helps to check if there is vallue $count');
 
@@ -79,25 +88,19 @@ class _HomepageState extends State<Homepage> {
         SmsColumn.DATE
       ]);
       RegExp exp = RegExp(mpesaFilter, multiLine: true);
-      for (var sms in allsms) {
-        bool matches = exp.hasMatch((sms.body).toString());
-        if (matches && count==null) {
-          await SmsDatabase.instance.insert({
-            SmsFields.id: sms.id,
-            SmsFields.body: sms.body,
-            SmsFields.title: sms.address,
-            SmsFields.date: sms.date,
-          });
-          // print(count);
-         
+      if (count == null) {
+        for (var sms in allsms) {
+          querrySms = await SmsDatabase.instance.readAll();
+          bool matches = exp.hasMatch((sms.body).toString());
+          if (matches) {
+            addSmsToDatabase(sms);
+            setState(() {
+              messages = [sms, ...messages];
+              querrySms.length;
+            });
+          }
         }
-         
-          setState(() {
-            messages = [sms, ...messages];
-            querrySms.length;
-          });
       }
-      querrySms = await SmsDatabase.instance.readAll();
 
       // var user = toJson(messages);
       // final jsonString = json.encode(user);
