@@ -18,6 +18,7 @@ class _HomepageState extends State<Homepage> {
   List<SmsMessage> messages = [];
   List txtSms = [];
   final telephony = Telephony.instance;
+  int count = 0;
 
   @override
   void initState() {
@@ -26,7 +27,7 @@ class _HomepageState extends State<Homepage> {
   }
 
   //convert to json
-   List<dynamic> toJson(smses) {
+  List<dynamic> toJson(smses) {
     for (var sms in smses) {
       var tinga = {
         'id': sms.address,
@@ -75,17 +76,19 @@ class _HomepageState extends State<Homepage> {
       for (var sms in allsms) {
         bool matches = exp.hasMatch((sms.body).toString());
         if (matches) {
-           SmsDatabase.instance.insert({
-            SmsFields.id:sms.id,
-            SmsFields.body:sms.body,
-            SmsFields.title:sms.address,
-            SmsFields.date:sms.date,
+          count = await SmsDatabase.instance.insert({
+            SmsFields.id: sms.id,
+            SmsFields.body: sms.body,
+            SmsFields.title: sms.address,
+            SmsFields.date: sms.date,
           });
           setState(() {
             messages = [sms, ...messages];
           });
         }
       }
+      print(count);
+
       var user = toJson(messages);
       final jsonString = json.encode(user);
       FileUtils.saveToFile(jsonString);

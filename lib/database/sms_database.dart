@@ -1,4 +1,3 @@
-import 'package:telephony/telephony.dart';
 import 'package:codee/models/messages.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -23,10 +22,6 @@ class SmsDatabase {
   }
 
   Future _createDB(Database db, int version) async {
-    const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
-    const textType = 'TEXT NOT NULL';
-    const integerType = 'INTEGER NOT NULL';
-
     await db.execute('''
     CREATE TABLE $smsDb(
       ${SmsFields.id} $idType,
