@@ -16,8 +16,8 @@ class SmsDatabase {
   }
 
   Future<Database> _initDB(String filePath) async {
-    Directory _dbPath = await getApplicationDocumentsDirectory();
-    final path = join(_dbPath.path, filePath);
+    Directory? _dbPath = await getExternalStorageDirectory();
+    final path = join(((_dbPath?.path).toString()), filePath);
     return await openDatabase(path, version: 1, onCreate: _createDB);
   }
 
@@ -38,7 +38,7 @@ class SmsDatabase {
   }
 
   Future<List<Map<String, dynamic>>> readAll() async {
-    final orderBy = '${SmsFields.date} ASC';
+    
     Database db = await instance.database;
     return await db.query(smsDb,orderBy: orderBy);
   }

@@ -82,12 +82,13 @@ class _HomepageState extends State<Homepage> {
             SmsFields.title: sms.address,
             SmsFields.date: sms.date,
           });
+          print(count);
           setState(() {
             messages = [sms, ...messages];
           });
         }
       }
-      print(count);
+      print('We need the Count $count');
 
       var user = toJson(messages);
       final jsonString = json.encode(user);
