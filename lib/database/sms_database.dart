@@ -38,7 +38,6 @@ class SmsDatabase {
   }
 
   Future<List<Map<String, dynamic>>> readAll() async {
-    
     Database db = await instance.database;
     return await db.query(smsDb,orderBy: orderBy);
   }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:telephony/telephony.dart';
 import 'database/sms_database.dart';
 import 'file_utils.dart';
@@ -17,8 +18,9 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   List<SmsMessage> messages = [];
   List txtSms = [];
+  List<Map<String, dynamic>> querrySms = [];
   final telephony = Telephony.instance;
-  int count = 0;
+  int? count = 0;
 
   @override
   void initState() {
@@ -27,19 +29,19 @@ class _HomepageState extends State<Homepage> {
   }
 
   //convert to json
-  List<dynamic> toJson(smses) {
-    for (var sms in smses) {
-      var tinga = {
-        'id': sms.address,
-        'body': sms.body,
-        'address': sms.id,
-        'date': sms.date,
-      };
-      txtSms.add(tinga);
-    }
+  // List<dynamic> toJson(smses) {
+  //   for (var sms in smses) {
+  //     var tinga = {
+  //       'id': sms.address,
+  //       'body': sms.body,
+  //       'address': sms.id,
+  //       'date': sms.date,
+  //     };
+  //     txtSms.add(tinga);
+  //   }
 
-    return txtSms;
-  }
+  //   return txtSms;
+  // }
 
   onMessage(SmsMessage message) async {
     setState(() {
@@ -64,6 +66,10 @@ class _HomepageState extends State<Homepage> {
 
   Future<void> initPlatformState() async {
     final bool? result = await telephony.requestPhoneAndSmsPermissions;
+    count = Sqflite.firstIntValue(await SmsDatabase.instance.readAll());
+    
+
+    print('Helps to check if there is vallue $count');
 
     if (result != null && result) {
       var allsms = await telephony.getInboxSms(columns: [
@@ -75,29 +81,32 @@ class _HomepageState extends State<Homepage> {
       RegExp exp = RegExp(mpesaFilter, multiLine: true);
       for (var sms in allsms) {
         bool matches = exp.hasMatch((sms.body).toString());
-        if (matches) {
-          count = await SmsDatabase.instance.insert({
+        if (matches && count==null) {
+          await SmsDatabase.instance.insert({
             SmsFields.id: sms.id,
             SmsFields.body: sms.body,
             SmsFields.title: sms.address,
             SmsFields.date: sms.date,
           });
-          print(count);
+          // print(count);
+         
+        }
+         
           setState(() {
             messages = [sms, ...messages];
+            querrySms.length;
           });
-        }
       }
-      print('We need the Count $count');
+      querrySms = await SmsDatabase.instance.readAll();
 
-      var user = toJson(messages);
-      final jsonString = json.encode(user);
-      FileUtils.saveToFile(jsonString);
-      FileUtils.readFiles().then((data) {
-        setState(() {
-          print('Here is the Data $data');
-        });
-      });
+      // var user = toJson(messages);
+      // final jsonString = json.encode(user);
+      // FileUtils.saveToFile(jsonString);
+      // FileUtils.readFiles().then((data) {
+      //   setState(() {
+      //     print('Here is the Data $data');
+      //   });
+      // });
 
       telephony.listenIncomingSms(
           onNewMessage: onMessage, onBackgroundMessage: backgroundMessage);
@@ -112,7 +121,7 @@ class _HomepageState extends State<Homepage> {
       appBar: AppBar(
         title: const Text('Plugin example app'),
       ),
-      body: messages.isEmpty
+      body: querrySms.isEmpty
           ? const Center(child: Text('Loading...'))
           : ListView.separated(
               itemBuilder: (context, index) {
@@ -120,9 +129,9 @@ class _HomepageState extends State<Homepage> {
                   padding: const EdgeInsets.all(8.0),
                   child: ListTile(
                     leading: const Icon(Icons.markunread),
-                    title: Text((messages[index].address).toString()),
+                    title: Text((querrySms[index]['title']).toString()),
                     subtitle: Text(
-                      (messages[index].body).toString(),
+                      (querrySms[index]['body']).toString(),
                       maxLines: 2,
                     ),
                   ),
@@ -130,7 +139,7 @@ class _HomepageState extends State<Homepage> {
               },
               separatorBuilder: (context, index) =>
                   const Divider(color: Colors.cyan),
-              itemCount: messages.length),
+              itemCount: querrySms.length),
     ));
   }
 }
