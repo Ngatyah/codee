@@ -17,7 +17,8 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   List<SmsMessage> messages = [];
-  List txtSms = [];
+  // List txtSms = [];
+  bool isLoading = false;
   List<Map<String, dynamic>> querrySms = [];
   final telephony = Telephony.instance;
   int? count = 0;
@@ -26,6 +27,7 @@ class _HomepageState extends State<Homepage> {
   void initState() {
     super.initState();
     initPlatformState();
+    refreshSmses();
   }
 
   //convert to json
@@ -52,26 +54,28 @@ class _HomepageState extends State<Homepage> {
   }
 
   onMessage(SmsMessage message) async {
-    setState(() async {
-      RegExp exp = RegExp(mpesaFilter, multiLine: true);
-      bool matches = exp.hasMatch((message.body).toString());
-      if (matches) {
-        addSmsToDatabase(message);
+    RegExp exp = RegExp(mpesaFilter, multiLine: true);
+    bool matches = exp.hasMatch((message.body).toString());
+    if (matches) {
+      addSmsToDatabase(message);
+      setState(() async {
         messages = [message, ...messages];
-      }
-    });
+      });
+    }
   }
 
   backgroundMessage(dynamic sms) async {
     var bgSms = widget.backgroundMessageHandler();
-    setState(() async {
-      RegExp exp = RegExp(mpesaFilter, multiLine: true);
-      bool matches = exp.hasMatch((bgSms.body).toString());
-      if (matches) {
-        addSmsToDatabase(bgSms);
+
+    RegExp exp = RegExp(mpesaFilter, multiLine: true);
+    bool matches = exp.hasMatch((bgSms.body).toString());
+    if (matches) {
+      refreshSmses();
+      addSmsToDatabase(bgSms);
+      setState(() async {
         messages = [bgSms, ...messages];
-      }
-    });
+      });
+    }
   }
 
   Future<void> initPlatformState() async {
@@ -115,6 +119,12 @@ class _HomepageState extends State<Homepage> {
           onNewMessage: onMessage, onBackgroundMessage: backgroundMessage);
     }
     if (!mounted) return;
+  }
+
+  Future refreshSmses() async {
+    setState(() => isLoading = true);
+    querrySms = await SmsDatabase.instance.readAll();
+    setState(() => isLoading = false);
   }
 
   @override
