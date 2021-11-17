@@ -100,6 +100,7 @@ class _HomepageState extends State<Homepage> with WidgetsBindingObserver {
     messageCount = txtMessages.length;
     print('Here we get Mpesa Messages Count $messageCount');
     dbCount = await SmsDatabase.instance.getProfilesCount();
+    int counter = dbCount??0;
 
     print('Count sms in DB $dbCount');
 
@@ -111,7 +112,7 @@ class _HomepageState extends State<Homepage> with WidgetsBindingObserver {
         SmsColumn.DATE
       ]);
 
-      if (dbCount == 0 || messageCount!=dbCount) {
+      if (dbCount == 0 || messageCount>counter) {
         for (var sms in allsms) {
           querrySms = await SmsDatabase.instance.readAll();
           bool matches = exp.hasMatch((sms.body).toString());
