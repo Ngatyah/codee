@@ -1,9 +1,6 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:telephony/telephony.dart';
 import 'database/sms_database.dart';
-import 'file_utils.dart';
 import 'models/messages.dart';
 
 const mpesaFilter = r"^[A-Z]{2}[\dA-Z]{8}\sConfirmed";
@@ -15,13 +12,14 @@ class Homepage extends StatefulWidget {
   _HomepageState createState() => _HomepageState();
 }
 
-class _HomepageState extends State<Homepage> {
+class _HomepageState extends State<Homepage> with WidgetsBindingObserver {
   List<SmsMessage> messages = [];
   // List txtSms = [];
   bool isLoading = false;
   List<Map<String, dynamic>> querrySms = [];
   final telephony = Telephony.instance;
-  int? count = 0;
+  int messageCount = 0;
+  int? dbCount = 0;
 
   @override
   void initState() {
@@ -29,10 +27,19 @@ class _HomepageState extends State<Homepage> {
     initPlatformState();
     refreshSmses();
   }
+
   @override
   void dispose() {
     super.dispose();
-     SmsDatabase.instance.close();
+    SmsDatabase.instance.close();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print("Did the cycle change");
+    setState(() {
+      refreshSmses();
+    });
   }
 
   //convert to json
@@ -59,6 +66,7 @@ class _HomepageState extends State<Homepage> {
   }
 
   onMessage(SmsMessage message) async {
+    
     RegExp exp = RegExp(mpesaFilter, multiLine: true);
     bool matches = exp.hasMatch((message.body).toString());
     if (matches) {
@@ -69,25 +77,31 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
-  backgroundMessage(dynamic sms) async {
-    var bgSms = widget.backgroundMessageHandler();
-
-    RegExp exp = RegExp(mpesaFilter, multiLine: true);
-    bool matches = exp.hasMatch((bgSms.body).toString());
-    if (matches) {
-      refreshSmses();
-      addSmsToDatabase(bgSms);
-      setState(() async {
-        messages = [bgSms, ...messages];
-      });
+  updateDb() {
+    for (var sms in messages) {
+      var messageId = sms.id;
+      print('This is the Message Id: $messageId');
     }
   }
 
   Future<void> initPlatformState() async {
+    var txtMessages = [];
+    RegExp exp = RegExp(mpesaFilter, multiLine: true);
     final bool? result = await telephony.requestPhoneAndSmsPermissions;
-    count = Sqflite.firstIntValue(await SmsDatabase.instance.readAll());
+    var allsms = await telephony.getInboxSms();
+    for (var text in allsms) {
+      bool matches = exp.hasMatch((text.body).toString());
+      if (matches) {
+        txtMessages = [text, ...txtMessages];
+      }
+    }
 
-    print('Helps to check if there is vallue $count');
+    querrySms = await SmsDatabase.instance.readAll();
+    messageCount = txtMessages.length;
+    print('Here we get Mpesa Messages Count $messageCount');
+    dbCount = await SmsDatabase.instance.getProfilesCount();
+
+    print('Count sms in DB $dbCount');
 
     if (result != null && result) {
       var allsms = await telephony.getInboxSms(columns: [
@@ -96,8 +110,8 @@ class _HomepageState extends State<Homepage> {
         SmsColumn.ID,
         SmsColumn.DATE
       ]);
-      RegExp exp = RegExp(mpesaFilter, multiLine: true);
-      if (count == null) {
+
+      if (dbCount == 0 || messageCount!=dbCount) {
         for (var sms in allsms) {
           querrySms = await SmsDatabase.instance.readAll();
           bool matches = exp.hasMatch((sms.body).toString());
@@ -110,7 +124,7 @@ class _HomepageState extends State<Homepage> {
           }
         }
       }
-
+      updateDb();
       // var user = toJson(messages);
       // final jsonString = json.encode(user);
       // FileUtils.saveToFile(jsonString);
@@ -121,12 +135,14 @@ class _HomepageState extends State<Homepage> {
       // });
 
       telephony.listenIncomingSms(
-          onNewMessage: onMessage, onBackgroundMessage: backgroundMessage);
+          onNewMessage: onMessage,
+          onBackgroundMessage: widget.backgroundMessageHandler as dynamic);
     }
     if (!mounted) return;
   }
 
   Future refreshSmses() async {
+    print("Refresher called");
     setState(() => isLoading = true);
     querrySms = await SmsDatabase.instance.readAll();
     setState(() => isLoading = false);
@@ -140,7 +156,9 @@ class _HomepageState extends State<Homepage> {
         title: const Text('Plugin example app'),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator(),)
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
           : ListView.separated(
               itemBuilder: (context, index) {
                 return Padding(

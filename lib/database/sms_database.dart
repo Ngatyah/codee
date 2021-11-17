@@ -36,6 +36,13 @@ class SmsDatabase {
     Database db = await instance.database;
     return await db.insert(smsDb, sms);
   }
+  Future <int?> getProfilesCount() async{
+    Database db = await instance.database;
+    final countQuery = await db.rawQuery("SELECT  COUNT(*) FROM " + smsDb);
+   final count = Sqflite.firstIntValue(countQuery);
+   
+    return count;
+}
 
   Future<List<Map<String, dynamic>>> readAll() async {
     Database db = await instance.database;
