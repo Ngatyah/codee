@@ -34,7 +34,7 @@ class SmsDatabase {
 
   Future<int> insert(Map<String, dynamic> sms) async {
     Database db = await instance.database;
-    return await db.insert(smsDb, sms);
+    return await db.insert(smsDb, sms, conflictAlgorithm: ConflictAlgorithm.ignore);
   }
   Future <int?> getProfilesCount() async{
     Database db = await instance.database;
@@ -43,6 +43,7 @@ class SmsDatabase {
    
     return count;
 }
+
 
   Future<List<Map<String, dynamic>>> readAll() async {
     Database db = await instance.database;
